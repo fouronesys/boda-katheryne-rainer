@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Wedding invitation management API for Katheryne & Rainer
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: guests
+    description: Guest management
+  - name: invitation
+    description: Public invitation access
+  - name: config
+    description: Wedding configuration
+  - name: stats
+    description: Dashboard statistics
 paths:
   /healthz:
     get:
@@ -24,6 +32,193 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /guests:
+    get:
+      operationId: listGuests
+      tags: [guests]
+      summary: List all guests
+      responses:
+        "200":
+          description: List of guests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guest"
+    post:
+      operationId: createGuest
+      tags: [guests]
+      summary: Create a new guest invitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuestInput"
+      responses:
+        "201":
+          description: Created guest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "400":
+          description: Invalid input
+
+  /guests/{id}:
+    get:
+      operationId: getGuest
+      tags: [guests]
+      summary: Get a guest by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Guest found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "404":
+          description: Guest not found
+    patch:
+      operationId: updateGuest
+      tags: [guests]
+      summary: Update a guest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuestUpdate"
+      responses:
+        "200":
+          description: Updated guest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "404":
+          description: Guest not found
+    delete:
+      operationId: deleteGuest
+      tags: [guests]
+      summary: Delete a guest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Guest not found
+
+  /invitation/{token}:
+    get:
+      operationId: getInvitation
+      tags: [invitation]
+      summary: Get invitation by unique token (public)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Invitation data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+        "404":
+          description: Invitation not found
+
+  /invitation/{token}/rsvp:
+    patch:
+      operationId: updateRsvp
+      tags: [invitation]
+      summary: Update RSVP status for a guest
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RsvpUpdate"
+      responses:
+        "200":
+          description: RSVP updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "404":
+          description: Invitation not found
+
+  /wedding-config:
+    get:
+      operationId: getWeddingConfig
+      tags: [config]
+      summary: Get wedding configuration
+      responses:
+        "200":
+          description: Wedding configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeddingConfig"
+    patch:
+      operationId: updateWeddingConfig
+      tags: [config]
+      summary: Update wedding configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeddingConfigUpdate"
+      responses:
+        "200":
+          description: Updated configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeddingConfig"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +229,165 @@ components:
       required:
         - status
 
+    Guest:
+      type: object
+      required: [id, name, invitationToken, rsvpStatus, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        tableNumber:
+          type: ["integer", "null"]
+        plusOne:
+          type: boolean
+        plusOneName:
+          type: ["string", "null"]
+        invitationToken:
+          type: string
+        rsvpStatus:
+          type: string
+          enum: [pending, confirmed, declined]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    GuestInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        tableNumber:
+          type: integer
+        plusOne:
+          type: boolean
+        plusOneName:
+          type: string
+        notes:
+          type: string
+
+    GuestUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        phone:
+          type: string
+        tableNumber:
+          type: integer
+        plusOne:
+          type: boolean
+        plusOneName:
+          type: string
+        rsvpStatus:
+          type: string
+          enum: [pending, confirmed, declined]
+        notes:
+          type: string
+
+    Invitation:
+      type: object
+      required: [guest, weddingConfig]
+      properties:
+        guest:
+          $ref: "#/components/schemas/Guest"
+        weddingConfig:
+          $ref: "#/components/schemas/WeddingConfig"
+
+    RsvpUpdate:
+      type: object
+      required: [rsvpStatus]
+      properties:
+        rsvpStatus:
+          type: string
+          enum: [pending, confirmed, declined]
+        plusOneName:
+          type: string
+
+    WeddingConfig:
+      type: object
+      required: [id, brideName, groomName, weddingDate, venue, venueAddress, dressCode, allowedColors, ceremonyTime, receptionTime]
+      properties:
+        id:
+          type: integer
+        brideName:
+          type: string
+        groomName:
+          type: string
+        weddingDate:
+          type: string
+        venue:
+          type: string
+        venueAddress:
+          type: string
+        dressCode:
+          type: string
+        allowedColors:
+          type: array
+          items:
+            type: string
+        ceremonyTime:
+          type: string
+        receptionTime:
+          type: string
+        additionalInfo:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+
+    WeddingConfigUpdate:
+      type: object
+      properties:
+        brideName:
+          type: string
+        groomName:
+          type: string
+        weddingDate:
+          type: string
+        venue:
+          type: string
+        venueAddress:
+          type: string
+        dressCode:
+          type: string
+        allowedColors:
+          type: array
+          items:
+            type: string
+        ceremonyTime:
+          type: string
+        receptionTime:
+          type: string
+        additionalInfo:
+          type: string
+
+    Stats:
+      type: object
+      required: [totalGuests, confirmed, declined, pending, withPlusOne, totalAttendees]
+      properties:
+        totalGuests:
+          type: integer
+        confirmed:
+          type: integer
+        declined:
+          type: integer
+        pending:
+          type: integer
+        withPlusOne:
+          type: integer
+        totalAttendees:
+          type: integer
