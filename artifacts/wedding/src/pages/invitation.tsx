@@ -1,7 +1,7 @@
 import { useParams } from "wouter";
 import { useGetInvitation, useUpdateRsvp, getGetInvitationQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion, MotionConfig } from "framer-motion";
+import { motion, MotionConfig, useReducedMotion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
@@ -11,8 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import oceanHero from "@/assets/ocean-hero.png";
-import oceanTexture from "@/assets/ocean-texture.png";
+import oceanHeroVideo from "@/assets/ocean-hero.mp4";
+import oceanHeroPoster from "@/assets/ocean-hero-poster.jpg";
+import oceanTextureVideo from "@/assets/ocean-texture.mp4";
+import oceanTexturePoster from "@/assets/ocean-texture-poster.jpg";
 
 const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
@@ -26,6 +28,7 @@ export default function Invitation() {
   const { toast } = useToast();
 
   const [plusOneName, setPlusOneName] = useState("");
+  const reduceMotion = useReducedMotion();
 
   if (isLoading) {
     return (
@@ -106,34 +109,20 @@ export default function Invitation() {
     <div className="min-h-screen bg-[#FDFBF7] text-[#553927] font-sans selection:bg-[#BCAE98] selection:text-white">
       {/* Hero Section */}
       <section className="relative min-h-[100svh] flex flex-col items-center justify-center p-6 overflow-hidden">
-        {/* Animated background image */}
+        {/* Animated background video — real ocean waves */}
         <div className="absolute inset-0 overflow-hidden">
-          <motion.img
-            src={oceanHero}
-            alt="Olas suaves del mar sobre la arena"
-            className="w-full h-full object-cover origin-center will-change-transform"
-            initial={{ scale: 1.12 }}
-            animate={{ scale: [1.12, 1.2, 1.12], y: ["0%", "-2%", "0%"] }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          />
-
-          {/* Tide wash — a soft sheet of foam sweeping the shore */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none mix-blend-screen"
-            style={{
-              background:
-                "linear-gradient(118deg, transparent 28%, rgba(255,255,255,0.30) 47%, rgba(255,255,255,0.06) 60%, transparent 72%)"
-            }}
-            animate={{ x: ["-14%", "14%", "-14%"], opacity: [0, 0.5, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-          />
-
-          {/* Drifting foam glow */}
-          <motion.div
-            className="absolute left-[2%] top-[52%] w-[72%] h-[38%] rounded-full bg-white/25 blur-3xl pointer-events-none mix-blend-screen"
-            animate={{ x: ["0%", "9%", "0%"], y: ["0%", "-4%", "0%"], opacity: [0.12, 0.32, 0.12] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <video
+            className="w-full h-full object-cover"
+            autoPlay={!reduceMotion}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            poster={oceanHeroPoster}
+          >
+            <source src={oceanHeroVideo} type="video/mp4" />
+          </video>
 
           {/* Legibility veil */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/60 via-[#FDFBF7]/30 to-[#FDFBF7]" />
@@ -281,7 +270,18 @@ export default function Invitation() {
 
       {/* Texture band */}
       <section className="relative h-[40vh] min-h-[280px] flex items-center justify-center overflow-hidden">
-        <img src={oceanTexture} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay={!reduceMotion}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          poster={oceanTexturePoster}
+        >
+          <source src={oceanTextureVideo} type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-[#553927]/30" />
         <motion.p
           initial={{ opacity: 0, y: 20 }}
