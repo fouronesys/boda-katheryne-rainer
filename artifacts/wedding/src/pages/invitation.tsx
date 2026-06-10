@@ -349,16 +349,20 @@ export default function Invitation() {
               <WaveDivider />
             </div>
             <div className="mx-auto w-full max-w-xs text-left">
-              <div className="flex items-center gap-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#BCAE98] text-[#705B46]">
-                  <Heart className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-serif text-2xl leading-tight text-[#553927]">Ceremonia</p>
-                  <p className="text-[#705B46]">{weddingConfig.ceremonyTime}</p>
-                </div>
-              </div>
-              <div className="ml-6 h-10 w-px bg-[#BCAE98]/50" />
+              {weddingConfig.ceremonyTime && (
+                <>
+                  <div className="flex items-center gap-5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#BCAE98] text-[#705B46]">
+                      <Heart className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-serif text-2xl leading-tight text-[#553927]">Ceremonia</p>
+                      <p className="text-[#705B46]">{weddingConfig.ceremonyTime}</p>
+                    </div>
+                  </div>
+                  <div className="ml-6 h-10 w-px bg-[#BCAE98]/50" />
+                </>
+              )}
               <div className="flex items-center gap-5">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#BCAE98] text-[#705B46]">
                   <PartyPopper className="h-5 w-5" />

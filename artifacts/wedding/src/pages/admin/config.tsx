@@ -210,8 +210,8 @@ function ConfigForm() {
               <Input id="weddingDate" name="weddingDate" type="date" defaultValue={config?.weddingDate?.split('T')[0]} required className="border-[#BCAE98]" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ceremonyTime">Hora de la ceremonia</Label>
-              <Input id="ceremonyTime" name="ceremonyTime" defaultValue={config?.ceremonyTime} required className="border-[#BCAE98]" placeholder="6:00 PM" />
+              <Label htmlFor="ceremonyTime">Hora de la ceremonia <span className="text-[#A38C70] font-normal">(opcional)</span></Label>
+              <Input id="ceremonyTime" name="ceremonyTime" defaultValue={config?.ceremonyTime} className="border-[#BCAE98]" placeholder="6:00 PM — dejar vacío para omitir" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="receptionTime">Hora de la recepción</Label>
