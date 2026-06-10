@@ -48,6 +48,7 @@ _Populate as the user states preferences worth remembering across sessions._
 
 ## Gotchas
 
+- The API server bundle (esbuild) **externalizes** native modules like `better-sqlite3` (see the `external` list in `artifacts/api-server/build.mjs`). Any externalized native module the server uses — even one pulled in transitively via `@workspace/db` — must be a **direct dependency of `@workspace/api-server`**, or the built server crashes on boot with `ERR_MODULE_NOT_FOUND`. `better-sqlite3` is in `onlyBuiltDependencies` but not the catalog, so pin an explicit version (`^12.10.0`), not `catalog:`.
 - wouter matches paths exactly by default. A wildcard like `<Route path="/admin*">` shadows nested routes (`/admin/config` → 404). Use explicit routes per page.
 - The admin API (config + guest CRUD) currently has **no authentication** — any field set via admin (e.g. `mapsUrl`) is effectively public/attacker-settable. Treat admin-set strings as untrusted in the guest-facing UI.
 - Verify the web app with `typecheck`, not `build` (build needs workflow-provided `PORT`/`BASE_PATH`).

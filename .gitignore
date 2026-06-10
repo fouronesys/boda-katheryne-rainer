@@ -44,6 +44,12 @@ Thumbs.db
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
+# SQLite runtime database files (created at runtime, never versioned)
+*.db
+*.db-shm
+*.db-wal
+data/
+
 # Replit
 .cache/
 .local/

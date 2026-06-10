@@ -1,0 +1,1 @@
+- [api-server native deps](api-server-native-deps.md) — externalized native modules (better-sqlite3 etc.) must be DIRECT deps of @workspace/api-server, not transitive, or the bundled server crashes on boot.
