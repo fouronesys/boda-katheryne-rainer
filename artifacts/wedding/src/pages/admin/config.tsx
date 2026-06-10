@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Heart, Shirt } from "lucide-react";
 
 export default function AdminConfig() {
   const { data: config, isLoading } = useGetWeddingConfig();
@@ -72,6 +72,13 @@ export default function AdminConfig() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="bg-white p-6 rounded-lg border border-[#BCAE98]/30 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 pb-2 border-b border-[#BCAE98]/30">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7DFD1] text-[#705B46]">
+              <Heart className="h-4 w-4" />
+            </div>
+            <h3 className="text-xl font-serif text-[#553927]">Los novios y el lugar</h3>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="brideName">Nombre de la novia</Label>
@@ -116,7 +123,12 @@ export default function AdminConfig() {
         </div>
 
         <div className="bg-white p-6 rounded-lg border border-[#BCAE98]/30 shadow-sm space-y-6">
-          <h3 className="text-xl font-serif text-[#553927]">Código de Vestimenta e Información</h3>
+          <div className="flex items-center gap-3 pb-2 border-b border-[#BCAE98]/30">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7DFD1] text-[#705B46]">
+              <Shirt className="h-4 w-4" />
+            </div>
+            <h3 className="text-xl font-serif text-[#553927]">Código de Vestimenta e Información</h3>
+          </div>
           
           <div className="space-y-2">
             <Label htmlFor="dressCode">Descripción del código de vestimenta</Label>

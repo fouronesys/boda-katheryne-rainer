@@ -5,12 +5,13 @@ import { motion, MotionConfig, useReducedMotion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { useState } from "react";
-import { MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, Heart, PartyPopper, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { WaveDivider } from "@/components/wave-divider";
 import oceanHeroVideo from "@/assets/ocean-hero.mp4";
 import oceanHeroPoster from "@/assets/ocean-hero-poster.jpg";
 import oceanTextureVideo from "@/assets/ocean-texture.mp4";
@@ -29,6 +30,12 @@ export default function Invitation() {
 
   const [plusOneName, setPlusOneName] = useState("");
   const reduceMotion = useReducedMotion();
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   if (isLoading) {
     return (
@@ -92,9 +99,25 @@ export default function Invitation() {
     }
   };
 
-  const formattedDate = weddingConfig.weddingDate
-    ? capitalize(format(parseISO(weddingConfig.weddingDate), "EEEE, d 'de' MMMM 'de' yyyy", { locale: es }))
-    : "";
+  const weddingDateObj = weddingConfig.weddingDate ? parseISO(weddingConfig.weddingDate) : null;
+
+  const dateParts = weddingDateObj
+    ? {
+        weekday: capitalize(format(weddingDateObj, "EEEE", { locale: es })),
+        day: format(weddingDateObj, "d", { locale: es }),
+        month: capitalize(format(weddingDateObj, "MMMM", { locale: es })),
+        year: format(weddingDateObj, "yyyy", { locale: es }),
+      }
+    : null;
+
+  const diffMs = weddingDateObj ? weddingDateObj.getTime() - now : 0;
+  const isFuture = diffMs > 0;
+  const countdown = {
+    days: Math.floor(diffMs / 86400000),
+    hours: Math.floor((diffMs % 86400000) / 3600000),
+    minutes: Math.floor((diffMs % 3600000) / 60000),
+    seconds: Math.floor((diffMs % 60000) / 1000),
+  };
 
   const customMaps = weddingConfig.mapsUrl?.trim();
   const mapsHref =
@@ -135,6 +158,16 @@ export default function Invitation() {
           variants={staggerContainer}
           className="relative z-10 text-center max-w-3xl mx-auto flex flex-col items-center"
         >
+          <motion.div
+            variants={fadeIn}
+            className="mb-8 flex h-16 w-16 items-center justify-center rounded-full border border-[#A38C70]/60 font-serif text-lg tracking-wide text-[#705B46] backdrop-blur-[1px]"
+            style={{ boxShadow: "0 2px 20px rgba(253,251,247,0.7)" }}
+          >
+            {weddingConfig.brideName.charAt(0)}
+            <span className="mx-0.5 italic text-[#A38C70]">&amp;</span>
+            {weddingConfig.groomName.charAt(0)}
+          </motion.div>
+
           <motion.p variants={fadeIn} className="uppercase tracking-[0.4em] text-xs text-[#705B46] mb-10">
             Junto a sus familias
           </motion.p>
@@ -166,12 +199,28 @@ export default function Invitation() {
             {weddingConfig.groomName}
           </motion.h1>
 
-          <motion.div variants={fadeIn} className="w-px h-16 bg-[#BCAE98] my-10" />
+          <motion.div variants={fadeIn} className="w-px h-12 bg-[#BCAE98] my-9" />
 
-          <motion.p variants={fadeIn} className="text-xl md:text-2xl text-[#705B46] font-serif mb-3">
-            {formattedDate}
-          </motion.p>
-          <motion.p variants={fadeIn} className="uppercase tracking-[0.25em] text-sm text-[#A38C70]">
+          {dateParts ? (
+            <motion.div
+              variants={fadeIn}
+              className="flex items-center justify-center gap-4 sm:gap-6 text-[#705B46]"
+            >
+              <span className="uppercase tracking-[0.3em] text-[11px] sm:text-xs">
+                {dateParts.weekday}
+              </span>
+              <span className="h-9 w-px bg-[#A38C70]/40" />
+              <span className="font-serif text-2xl sm:text-3xl leading-none whitespace-nowrap text-[#4A301F]">
+                {dateParts.day} {dateParts.month}
+              </span>
+              <span className="h-9 w-px bg-[#A38C70]/40" />
+              <span className="uppercase tracking-[0.3em] text-[11px] sm:text-xs">
+                {dateParts.year}
+              </span>
+            </motion.div>
+          ) : null}
+
+          <motion.p variants={fadeIn} className="uppercase tracking-[0.25em] text-sm text-[#A38C70] mt-5">
             {weddingConfig.venue}
           </motion.p>
         </motion.div>
@@ -186,6 +235,53 @@ export default function Invitation() {
         </motion.div>
       </section>
 
+      {/* Countdown */}
+      {weddingDateObj && (
+        <section className="py-16 px-6 bg-[#F3EEE6] text-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={staggerContainer}
+            className="max-w-2xl mx-auto flex flex-col items-center"
+          >
+            <motion.h2 variants={fadeIn} className="text-[#A38C70] uppercase tracking-[0.3em] text-xs mb-4">
+              Cuenta Regresiva
+            </motion.h2>
+            <motion.div variants={fadeIn} className="text-[#BCAE98] mb-8">
+              <WaveDivider className="mx-auto" />
+            </motion.div>
+
+            {isFuture ? (
+              <motion.div variants={fadeIn} className="flex items-stretch justify-center gap-3 sm:gap-6">
+                {[
+                  { value: countdown.days, label: "Días" },
+                  { value: countdown.hours, label: "Horas" },
+                  { value: countdown.minutes, label: "Minutos" },
+                  { value: countdown.seconds, label: "Segundos" },
+                ].map((unit, i) => (
+                  <div key={unit.label} className="flex items-stretch gap-3 sm:gap-6">
+                    {i > 0 && <span className="self-center font-serif text-2xl text-[#BCAE98]">:</span>}
+                    <div className="flex w-16 sm:w-24 flex-col items-center">
+                      <span className="font-serif text-4xl sm:text-6xl leading-none text-[#553927] tabular-nums">
+                        {String(unit.value).padStart(2, "0")}
+                      </span>
+                      <span className="mt-3 uppercase tracking-[0.2em] text-[10px] sm:text-xs text-[#A38C70]">
+                        {unit.label}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            ) : (
+              <motion.p variants={fadeIn} className="font-serif text-2xl sm:text-3xl text-[#553927]">
+                ¡Hoy celebramos nuestro amor!
+              </motion.p>
+            )}
+          </motion.div>
+        </section>
+      )}
+
       {/* Greeting */}
       <section className="py-20 px-6 bg-[#FAF9F6] text-center">
         <motion.div
@@ -196,7 +292,10 @@ export default function Invitation() {
           className="max-w-2xl mx-auto"
         >
           <p className="uppercase tracking-[0.25em] text-xs text-[#A38C70] mb-4">Con cariño para</p>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#553927] mb-6">{guest.name}</h2>
+          <h2 className="font-serif text-3xl md:text-4xl text-[#553927] mb-5">{guest.name}</h2>
+          <div className="flex justify-center text-[#BCAE98] mb-6">
+            <WaveDivider />
+          </div>
           <p className="text-[#705B46] leading-relaxed text-lg">
             Será un honor compartir contigo este día tan especial. Después de
             trece años caminando juntos, queremos celebrar a tu lado el comienzo
@@ -206,7 +305,7 @@ export default function Invitation() {
       </section>
 
       {/* Nuestra Historia */}
-      <section className="py-24 px-6 bg-[#FAF9F6]">
+      <section className="py-24 px-6 bg-[#F3EEE6]">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -217,8 +316,8 @@ export default function Invitation() {
           <motion.h2 variants={fadeIn} className="text-[#A38C70] uppercase tracking-[0.25em] text-sm">
             Nuestra Historia
           </motion.h2>
-          <motion.div variants={fadeIn} className="flex justify-center">
-            <span className="w-12 h-px bg-[#BCAE98]" />
+          <motion.div variants={fadeIn} className="flex justify-center text-[#BCAE98]">
+            <WaveDivider />
           </motion.div>
           <motion.p variants={fadeIn} className="text-[#705B46] leading-relaxed text-lg">
             Hace trece años, el destino quiso que nuestros caminos se cruzaran.
@@ -242,16 +341,39 @@ export default function Invitation() {
           variants={staggerContainer}
           className="max-w-2xl mx-auto space-y-24 text-center"
         >
-          <motion.div variants={fadeIn} className="space-y-4">
+          <motion.div variants={fadeIn} className="space-y-6">
             <h2 className="text-[#A38C70] uppercase tracking-[0.25em] text-sm">El Programa</h2>
-            <div className="font-serif text-2xl space-y-2">
-              <p>Ceremonia a las {weddingConfig.ceremonyTime}</p>
-              <p>Recepción a las {weddingConfig.receptionTime}</p>
+            <div className="flex justify-center text-[#BCAE98]">
+              <WaveDivider />
+            </div>
+            <div className="mx-auto w-full max-w-xs text-left">
+              <div className="flex items-center gap-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#BCAE98] text-[#705B46]">
+                  <Heart className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-serif text-2xl leading-tight text-[#553927]">Ceremonia</p>
+                  <p className="text-[#705B46]">{weddingConfig.ceremonyTime}</p>
+                </div>
+              </div>
+              <div className="ml-6 h-10 w-px bg-[#BCAE98]/50" />
+              <div className="flex items-center gap-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#BCAE98] text-[#705B46]">
+                  <PartyPopper className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-serif text-2xl leading-tight text-[#553927]">Recepción</p>
+                  <p className="text-[#705B46]">{weddingConfig.receptionTime}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
 
           <motion.div variants={fadeIn} className="space-y-5">
             <h2 className="text-[#A38C70] uppercase tracking-[0.25em] text-sm">El Lugar</h2>
+            <div className="flex justify-center text-[#BCAE98]">
+              <WaveDivider />
+            </div>
             <div className="font-serif text-2xl">
               <p>{weddingConfig.venue}</p>
               <p className="text-lg text-[#705B46] mt-2 whitespace-pre-line font-sans">{weddingConfig.venueAddress}</p>
@@ -295,7 +417,7 @@ export default function Invitation() {
       </section>
 
       {/* Dress code & info */}
-      <section className="py-24 px-6 bg-[#FAF9F6]">
+      <section className="py-24 px-6 bg-[#F3EEE6]">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -306,16 +428,19 @@ export default function Invitation() {
           {weddingConfig.dressCode && (
             <motion.div variants={fadeIn} className="space-y-6">
               <h2 className="text-[#A38C70] uppercase tracking-[0.25em] text-sm">Código de Vestimenta</h2>
+              <div className="flex justify-center text-[#BCAE98]">
+                <WaveDivider />
+              </div>
               <p className="font-serif text-xl">{weddingConfig.dressCode}</p>
 
               {weddingConfig.allowedColors && weddingConfig.allowedColors.length > 0 && (
                 <>
                   <p className="text-sm text-[#705B46]">Paleta de colores sugerida</p>
-                  <div className="flex flex-wrap justify-center gap-4 mt-2">
+                  <div className="flex flex-wrap justify-center gap-5 mt-2">
                     {weddingConfig.allowedColors.map((color, i) => (
                       <div
                         key={i}
-                        className="w-10 h-10 rounded-full shadow-sm border border-black/5"
+                        className="h-12 w-12 rounded-full border border-black/5 shadow-sm ring-1 ring-[#BCAE98]/40 ring-offset-2 ring-offset-[#F3EEE6]"
                         style={{ backgroundColor: color }}
                       />
                     ))}
@@ -395,6 +520,19 @@ export default function Invitation() {
               animate={{ scale: 1, opacity: 1 }}
               className="py-8"
             >
+              <div
+                className={`mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full ${
+                  guest.rsvpStatus === "confirmed"
+                    ? "bg-[#553927] text-white"
+                    : "bg-[#D9D3C5] text-[#705B46]"
+                }`}
+              >
+                {guest.rsvpStatus === "confirmed" ? (
+                  <Check className="h-6 w-6" />
+                ) : (
+                  <Heart className="h-6 w-6" />
+                )}
+              </div>
               <p className="text-2xl font-serif text-[#553927] mb-4">
                 {guest.rsvpStatus === "confirmed"
                   ? "¡Nos alegra mucho que nos acompañes!"
@@ -414,11 +552,19 @@ export default function Invitation() {
 
       {/* Footer & QR */}
       <footer className="py-24 px-6 flex flex-col items-center bg-[#553927] text-[#FAF9F6]">
-        <h3 className="font-serif text-3xl mb-12 opacity-80">
-          {weddingConfig.brideName.charAt(0)} &amp; {weddingConfig.groomName.charAt(0)}
+        <div className="text-[#BCAE98] mb-8">
+          <WaveDivider />
+        </div>
+        <h3 className="font-serif text-4xl mb-3 text-[#FAF9F6]">
+          {weddingConfig.brideName} <span className="italic text-[#BCAE98]">&amp;</span> {weddingConfig.groomName}
         </h3>
+        {dateParts && (
+          <p className="uppercase tracking-[0.3em] text-[11px] text-[#D9D3C5]/70 mb-12">
+            {dateParts.day} · {dateParts.month} · {dateParts.year}
+          </p>
+        )}
 
-        <div className="bg-[#FAF9F6] p-4 shadow-xl mb-12">
+        <div className="bg-[#FAF9F6] p-4 shadow-xl mb-6">
           <QRCodeSVG
             value={window.location.href}
             size={160}

@@ -33,13 +33,21 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { QRCodeSVG } from "qrcode.react";
-import { Plus, Copy, QrCode, Trash, Edit, Search } from "lucide-react";
+import { Plus, Copy, QrCode, Trash, Edit, Search, Users, CheckCircle2, Clock, XCircle } from "lucide-react";
 
 const statusLabels: Record<string, string> = {
   pending: "Pendiente",
   confirmed: "Confirmado",
   declined: "Declinado",
 };
+
+const getInitials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
 
 export default function AdminDashboard() {
   const { data: stats } = useGetStats();
@@ -125,6 +133,9 @@ export default function AdminDashboard() {
     return matchesSearch && matchesStatus;
   });
 
+  const confirmRate =
+    stats && stats.totalGuests > 0 ? Math.round((stats.confirmed / stats.totalGuests) * 100) : 0;
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-end">
@@ -170,18 +181,53 @@ export default function AdminDashboard() {
       </div>
 
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[
-            { label: "Total de Invitados", value: stats.totalGuests },
-            { label: "Confirmados", value: stats.confirmed },
-            { label: "Pendientes", value: stats.pending },
-            { label: "Declinados", value: stats.declined },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-white p-6 rounded-lg border border-[#BCAE98]/30 shadow-sm">
-              <p className="text-sm text-[#705B46] uppercase tracking-wider">{stat.label}</p>
-              <p className="text-3xl font-serif text-[#553927] mt-2">{stat.value}</p>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total de Invitados", value: stats.totalGuests, icon: Users, fg: "#705B46", bg: "#E7DFD1" },
+              { label: "Confirmados", value: stats.confirmed, icon: CheckCircle2, fg: "#1F7A52", bg: "#DCEDE2" },
+              { label: "Pendientes", value: stats.pending, icon: Clock, fg: "#9A6B17", bg: "#F4E7CC" },
+              { label: "Declinados", value: stats.declined, icon: XCircle, fg: "#A23B43", bg: "#F2DBDD" },
+            ].map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.label}
+                  className="bg-white p-5 rounded-xl border border-[#BCAE98]/30 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] text-[#705B46] uppercase tracking-[0.15em]">{stat.label}</p>
+                      <p className="text-4xl font-serif text-[#553927] mt-2 tabular-nums">{stat.value}</p>
+                    </div>
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                      style={{ backgroundColor: stat.bg, color: stat.fg }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {stats.totalGuests > 0 && (
+            <div className="bg-white p-6 rounded-xl border border-[#BCAE98]/30 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-[#553927]">Tasa de confirmación</p>
+                <p className="text-sm text-[#705B46] tabular-nums">
+                  {stats.confirmed} de {stats.totalGuests} · {confirmRate}%
+                </p>
+              </div>
+              <div className="h-2.5 w-full rounded-full bg-[#EDE6DA] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#553927] transition-all duration-700"
+                  style={{ width: `${confirmRate}%` }}
+                />
+              </div>
             </div>
-          ))}
+          )}
         </div>
       )}
 
@@ -222,22 +268,39 @@ export default function AdminDashboard() {
           <TableBody>
             {guestsLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Cargando invitados...</TableCell>
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">Cargando invitados...</TableCell>
               </TableRow>
             ) : filteredGuests?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No se encontraron invitados.</TableCell>
+                <TableCell colSpan={5} className="py-14 text-center">
+                  <div className="flex flex-col items-center gap-2 text-[#A38C70]">
+                    <Users className="h-8 w-8" />
+                    <p className="text-[#705B46]">No se encontraron invitados.</p>
+                  </div>
+                </TableCell>
               </TableRow>
             ) : (
               filteredGuests?.map((guest) => (
-                <TableRow key={guest.id} className="border-[#BCAE98]/20">
-                  <TableCell className="font-medium text-[#553927]">{guest.name}</TableCell>
+                <TableRow key={guest.id} className="border-[#BCAE98]/20 transition-colors hover:bg-[#FAF9F6]">
+                  <TableCell className="font-medium text-[#553927]">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#BCAE98]/25 font-serif text-sm text-[#705B46]">
+                        {getInitials(guest.name)}
+                      </div>
+                      <span>{guest.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      guest.rsvpStatus === 'confirmed' ? 'bg-green-100 text-green-800' :
-                      guest.rsvpStatus === 'declined' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 ring-inset ${
+                      guest.rsvpStatus === 'confirmed' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' :
+                      guest.rsvpStatus === 'declined' ? 'bg-rose-50 text-rose-700 ring-rose-600/20' :
+                      'bg-amber-50 text-amber-700 ring-amber-600/20'
                     }`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${
+                        guest.rsvpStatus === 'confirmed' ? 'bg-emerald-500' :
+                        guest.rsvpStatus === 'declined' ? 'bg-rose-500' :
+                        'bg-amber-500'
+                      }`} />
                       {statusLabels[guest.rsvpStatus] ?? guest.rsvpStatus}
                     </span>
                   </TableCell>
