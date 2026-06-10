@@ -13,6 +13,7 @@ export interface WeddingConfigUpdate {
   venue?: string;
   venueAddress?: string;
   mapsUrl?: string;
+  musicUrl?: string;
   dressCode?: string;
   allowedColors?: string[];
   ceremonyTime?: string;

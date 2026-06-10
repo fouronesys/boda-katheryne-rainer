@@ -78,6 +78,8 @@ export interface WeddingConfig {
   venueAddress: string;
   /** @nullable */
   mapsUrl?: string | null;
+  /** @nullable */
+  musicUrl?: string | null;
   dressCode: string;
   allowedColors: string[];
   ceremonyTime: string;
@@ -113,6 +115,7 @@ export interface WeddingConfigUpdate {
   venue?: string;
   venueAddress?: string;
   mapsUrl?: string;
+  musicUrl?: string;
   dressCode?: string;
   allowedColors?: string[];
   ceremonyTime?: string;

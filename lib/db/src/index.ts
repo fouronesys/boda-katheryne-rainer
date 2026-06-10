@@ -26,10 +26,11 @@ export function ensureSchema(): void {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       bride_name TEXT NOT NULL DEFAULT 'Katheryne',
       groom_name TEXT NOT NULL DEFAULT 'Rainer',
-      wedding_date TEXT NOT NULL DEFAULT '2026-12-20',
+      wedding_date TEXT NOT NULL DEFAULT '2026-11-20',
       venue TEXT NOT NULL DEFAULT 'Salón Océano',
       venue_address TEXT NOT NULL DEFAULT 'Av. del Mar 123, Santo Domingo',
       maps_url TEXT,
+      music_url TEXT,
       dress_code TEXT NOT NULL DEFAULT 'Formal — Elegante',
       allowed_colors TEXT NOT NULL DEFAULT '["#BCAE98","#D9D3C5","#A38C70","#705B46","#553927","#FFFFFF","#F5F0EB"]',
       ceremony_time TEXT NOT NULL DEFAULT '6:00 PM',
@@ -53,6 +54,20 @@ export function ensureSchema(): void {
       updated_at INTEGER NOT NULL DEFAULT (unixepoch())
     );
   `);
+
+  // Idempotent column additions for databases created before a column existed
+  // (e.g. an existing CapRover volume). CREATE TABLE IF NOT EXISTS above does
+  // not alter an existing table, so upgrade it here.
+  addColumnIfMissing("wedding_config", "music_url", "music_url TEXT");
+}
+
+function addColumnIfMissing(table: string, column: string, ddl: string): void {
+  const columns = sqlite
+    .prepare(`PRAGMA table_info(${table})`)
+    .all() as Array<{ name: string }>;
+  if (!columns.some((c) => c.name === column)) {
+    sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
 }
 
 export * from "./schema";

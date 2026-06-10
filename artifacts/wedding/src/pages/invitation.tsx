@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { WaveDivider } from "@/components/wave-divider";
+import { BackgroundMusic } from "@/components/background-music";
 import oceanHeroVideo from "@/assets/ocean-hero.mp4";
 import oceanHeroPoster from "@/assets/ocean-hero-poster.jpg";
 import oceanTextureVideo from "@/assets/ocean-texture.mp4";
@@ -129,6 +130,7 @@ export default function Invitation() {
 
   return (
     <MotionConfig reducedMotion="user">
+    <BackgroundMusic url={weddingConfig.musicUrl} />
     <div className="min-h-screen bg-[#FDFBF7] text-[#553927] font-sans selection:bg-[#BCAE98] selection:text-white">
       {/* Hero Section */}
       <section className="relative min-h-[100svh] flex flex-col items-center justify-center p-6 overflow-hidden">

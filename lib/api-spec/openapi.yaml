@@ -336,6 +336,8 @@ components:
           type: string
         mapsUrl:
           type: ["string", "null"]
+        musicUrl:
+          type: ["string", "null"]
         dressCode:
           type: string
         allowedColors:
@@ -365,6 +367,8 @@ components:
         venueAddress:
           type: string
         mapsUrl:
+          type: string
+        musicUrl:
           type: string
         dressCode:
           type: string

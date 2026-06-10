@@ -141,6 +141,7 @@ function ConfigForm() {
         venue: formData.get("venue") as string,
         venueAddress: formData.get("venueAddress") as string,
         mapsUrl: formData.get("mapsUrl") as string,
+        musicUrl: formData.get("musicUrl") as string,
         ceremonyTime: formData.get("ceremonyTime") as string,
         receptionTime: formData.get("receptionTime") as string,
         dressCode: formData.get("dressCode") as string,
@@ -278,6 +279,12 @@ function ConfigForm() {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="musicUrl">Música de fondo (enlace de YouTube)</Label>
+            <Input id="musicUrl" name="musicUrl" type="url" defaultValue={config?.musicUrl || ""} className="border-[#BCAE98]" placeholder="https://www.youtube.com/watch?v=..." />
+            <p className="text-xs text-muted-foreground">Pega un enlace de YouTube. La música se reproducirá automáticamente al abrir la invitación; los invitados pueden silenciarla con el botón de la esquina. Déjalo vacío para no usar música.</p>
           </div>
 
           <div className="space-y-2">
