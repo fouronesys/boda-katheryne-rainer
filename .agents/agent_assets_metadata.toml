@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "6wBvhLry8JUrQku_484lt"
+uri = "file://artifacts/wedding/src/assets/ocean-hero.png"
+type = "image"
+title = "ocean hero background"
+
+[[generated]]
+id = "ADTefGMbEq7pw34GuMvya"
+uri = "file://artifacts/wedding/src/assets/ocean-texture.png"
+type = "image"
+title = "ocean texture divider"

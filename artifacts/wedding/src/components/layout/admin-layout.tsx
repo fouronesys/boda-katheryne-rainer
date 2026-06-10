@@ -11,8 +11,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
 
   const navItems = [
-    { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/config", icon: Settings, label: "Wedding Config" },
+    { href: "/admin", icon: LayoutDashboard, label: "Panel" },
+    { href: "/admin/config", icon: Settings, label: "Configuración" },
   ];
 
   return (
@@ -24,7 +24,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             Katheryne & Rainer
           </h1>
           <p className="text-sm text-muted-foreground mt-1 tracking-wider uppercase text-xs">
-            Admin Panel
+            Panel de Administración
           </p>
         </div>
         <nav className="px-4 pb-6 space-y-1">

@@ -13,6 +13,8 @@ export interface WeddingConfig {
   weddingDate: string;
   venue: string;
   venueAddress: string;
+  /** @nullable */
+  mapsUrl?: string | null;
   dressCode: string;
   allowedColors: string[];
   ceremonyTime: string;

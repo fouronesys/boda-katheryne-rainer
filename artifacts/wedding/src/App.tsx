@@ -19,24 +19,21 @@ const queryClient = new QueryClient({
   },
 });
 
-function AdminRoutes() {
-  return (
-    <AdminLayout>
-      <Switch>
-        <Route path="/admin" component={AdminDashboard} />
-        <Route path="/admin/config" component={AdminConfig} />
-        <Route component={NotFound} />
-      </Switch>
-    </AdminLayout>
-  );
-}
-
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/invitation/:token" component={Invitation} />
-      <Route path="/admin*" component={AdminRoutes} />
+      <Route path="/admin">
+        <AdminLayout>
+          <AdminDashboard />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/config">
+        <AdminLayout>
+          <AdminConfig />
+        </AdminLayout>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
