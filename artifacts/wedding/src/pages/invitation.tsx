@@ -221,8 +221,8 @@ export default function Invitation() {
             <span className="w-12 h-px bg-[#BCAE98]" />
           </motion.div>
           <motion.p variants={fadeIn} className="text-[#705B46] leading-relaxed text-lg">
-            Hace trece años, una noche en un <em>nightclub</em> de la ciudad,
-            nuestras vidas se cruzaron. Desde aquel instante nos hicimos pareja,
+            Hace trece años, el destino quiso que nuestros caminos se cruzaran.
+            Desde aquel primer encuentro nos hicimos pareja,
             y así seguimos, juntos, hasta el sol de hoy.
           </motion.p>
           <motion.p variants={fadeIn} className="text-[#705B46] leading-relaxed text-lg">
