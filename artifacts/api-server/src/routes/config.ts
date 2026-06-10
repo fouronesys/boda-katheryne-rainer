@@ -7,6 +7,7 @@ import {
   UpdateWeddingConfigResponse,
 } from "@workspace/api-zod";
 import { serializeConfig } from "../lib/serialize";
+import { requireAdmin } from "../lib/admin-auth";
 
 const router: IRouter = Router();
 
@@ -26,7 +27,7 @@ router.get("/wedding-config", async (req, res): Promise<void> => {
   res.json(GetWeddingConfigResponse.parse(parsed));
 });
 
-router.patch("/wedding-config", async (req, res): Promise<void> => {
+router.patch("/wedding-config", requireAdmin, async (req, res): Promise<void> => {
   const parsed = UpdateWeddingConfigBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

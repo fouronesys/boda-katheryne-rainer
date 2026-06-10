@@ -1,5 +1,8 @@
+import { ensureSchema } from "@workspace/db";
 import app from "./app";
 import { logger } from "./lib/logger";
+
+ensureSchema();
 
 const rawPort = process.env["PORT"];
 

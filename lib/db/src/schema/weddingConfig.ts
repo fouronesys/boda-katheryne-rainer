@@ -1,9 +1,9 @@
-import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const weddingConfigTable = pgTable("wedding_config", {
-  id: serial("id").primaryKey(),
+export const weddingConfigTable = sqliteTable("wedding_config", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   brideName: text("bride_name").notNull().default("Katheryne"),
   groomName: text("groom_name").notNull().default("Rainer"),
   weddingDate: text("wedding_date").notNull().default("2026-12-20"),
@@ -15,7 +15,10 @@ export const weddingConfigTable = pgTable("wedding_config", {
   ceremonyTime: text("ceremony_time").notNull().default("6:00 PM"),
   receptionTime: text("reception_time").notNull().default("7:30 PM"),
   additionalInfo: text("additional_info"),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date())
+    .$onUpdate(() => new Date()),
 });
 
 export const insertWeddingConfigSchema = createInsertSchema(weddingConfigTable).omit({

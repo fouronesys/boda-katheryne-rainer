@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/.tsbuildinfo
+**/*.tsbuildinfo
+.git
+.local
+.cache
+.agents
+data
+*.log
+artifacts/*/dist

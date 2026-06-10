@@ -1,20 +1,25 @@
-import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const guestsTable = pgTable("guests", {
-  id: serial("id").primaryKey(),
+export const guestsTable = sqliteTable("guests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email"),
   phone: text("phone"),
   tableNumber: integer("table_number"),
-  plusOne: boolean("plus_one").notNull().default(false),
+  plusOne: integer("plus_one", { mode: "boolean" }).notNull().default(false),
   plusOneName: text("plus_one_name"),
   invitationToken: text("invitation_token").notNull().unique(),
   rsvpStatus: text("rsvp_status").notNull().default("pending"),
   notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date())
+    .$onUpdate(() => new Date()),
 });
 
 export const insertGuestSchema = createInsertSchema(guestsTable).omit({

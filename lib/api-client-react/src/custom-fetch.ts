@@ -17,6 +17,18 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 
 let _baseUrl: string | null = null;
 let _authTokenGetter: AuthTokenGetter | null = null;
+let _adminPassword: string | null = null;
+
+const ADMIN_PASSWORD_HEADER = "x-admin-password";
+
+/**
+ * Set the admin password attached as the `x-admin-password` header on every
+ * request. Used to unlock admin-only routes (e.g. updating the wedding config).
+ * Pass `null` to clear it (lock again).
+ */
+export function setAdminPassword(password: string | null): void {
+  _adminPassword = password && password.length > 0 ? password : null;
+}
 
 /**
  * Set a base URL that is prepended to every relative request URL
@@ -356,6 +368,11 @@ export async function customFetch<T = unknown>(
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
     }
+  }
+
+  // Attach the admin password header when configured and not already set.
+  if (_adminPassword && !headers.has(ADMIN_PASSWORD_HEADER)) {
+    headers.set(ADMIN_PASSWORD_HEADER, _adminPassword);
   }
 
   const requestInfo = { method, url: resolveUrl(input) };
