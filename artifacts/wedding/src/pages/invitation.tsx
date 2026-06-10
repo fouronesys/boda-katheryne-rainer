@@ -1,7 +1,7 @@
 import { useParams } from "wouter";
 import { useGetInvitation, useUpdateRsvp, getGetInvitationQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
@@ -102,16 +102,39 @@ export default function Invitation() {
         )}`;
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen bg-[#FDFBF7] text-[#553927] font-sans selection:bg-[#BCAE98] selection:text-white">
       {/* Hero Section */}
       <section className="relative min-h-[100svh] flex flex-col items-center justify-center p-6 overflow-hidden">
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <img
+        {/* Animated background image */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.img
             src={oceanHero}
             alt="Olas suaves del mar sobre la arena"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover origin-center will-change-transform"
+            initial={{ scale: 1.12 }}
+            animate={{ scale: [1.12, 1.2, 1.12], y: ["0%", "-2%", "0%"] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
           />
+
+          {/* Tide wash — a soft sheet of foam sweeping the shore */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none mix-blend-screen"
+            style={{
+              background:
+                "linear-gradient(118deg, transparent 28%, rgba(255,255,255,0.30) 47%, rgba(255,255,255,0.06) 60%, transparent 72%)"
+            }}
+            animate={{ x: ["-14%", "14%", "-14%"], opacity: [0, 0.5, 0] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          {/* Drifting foam glow */}
+          <motion.div
+            className="absolute left-[2%] top-[52%] w-[72%] h-[38%] rounded-full bg-white/25 blur-3xl pointer-events-none mix-blend-screen"
+            animate={{ x: ["0%", "9%", "0%"], y: ["0%", "-4%", "0%"], opacity: [0.12, 0.32, 0.12] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+
           {/* Legibility veil */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/60 via-[#FDFBF7]/30 to-[#FDFBF7]" />
           <div className="absolute inset-0 bg-[#705B46]/5" />
@@ -127,13 +150,30 @@ export default function Invitation() {
             Junto a sus familias
           </motion.p>
 
-          <motion.h1 variants={fadeIn} className="font-serif text-6xl sm:text-7xl lg:text-8xl leading-[1.05] text-[#553927] drop-shadow-sm">
+          <motion.h1
+            variants={fadeIn}
+            className="font-serif text-6xl sm:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-[#4A301F]"
+            style={{ textShadow: "0 2px 22px rgba(253,251,247,0.85)" }}
+          >
             {weddingConfig.brideName}
           </motion.h1>
-          <motion.div variants={fadeIn} className="my-4 text-4xl sm:text-5xl text-[#BCAE98] font-light italic font-serif">
-            &amp;
+
+          <motion.div variants={fadeIn} className="flex items-center gap-4 my-5">
+            <span className="h-px w-10 sm:w-14 bg-[#A38C70]/70" />
+            <span
+              className="font-serif italic text-5xl sm:text-6xl text-[#705B46]"
+              style={{ textShadow: "0 2px 18px rgba(253,251,247,0.85)" }}
+            >
+              &amp;
+            </span>
+            <span className="h-px w-10 sm:w-14 bg-[#A38C70]/70" />
           </motion.div>
-          <motion.h1 variants={fadeIn} className="font-serif text-6xl sm:text-7xl lg:text-8xl leading-[1.05] text-[#553927] drop-shadow-sm">
+
+          <motion.h1
+            variants={fadeIn}
+            className="font-serif text-6xl sm:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-[#4A301F]"
+            style={{ textShadow: "0 2px 22px rgba(253,251,247,0.85)" }}
+          >
             {weddingConfig.groomName}
           </motion.h1>
 
@@ -169,9 +209,38 @@ export default function Invitation() {
           <p className="uppercase tracking-[0.25em] text-xs text-[#A38C70] mb-4">Con cariño para</p>
           <h2 className="font-serif text-3xl md:text-4xl text-[#553927] mb-6">{guest.name}</h2>
           <p className="text-[#705B46] leading-relaxed text-lg">
-            Será un honor para nosotros compartir contigo este día tan especial.
-            Acompáñanos a celebrar el comienzo de nuestra nueva vida juntos.
+            Será un honor compartir contigo este día tan especial. Después de
+            trece años caminando juntos, queremos celebrar a tu lado el comienzo
+            de nuestra vida como esposos.
           </p>
+        </motion.div>
+      </section>
+
+      {/* Nuestra Historia */}
+      <section className="py-24 px-6 bg-[#FAF9F6]">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={staggerContainer}
+          className="max-w-2xl mx-auto text-center space-y-6"
+        >
+          <motion.h2 variants={fadeIn} className="text-[#A38C70] uppercase tracking-[0.25em] text-sm">
+            Nuestra Historia
+          </motion.h2>
+          <motion.div variants={fadeIn} className="flex justify-center">
+            <span className="w-12 h-px bg-[#BCAE98]" />
+          </motion.div>
+          <motion.p variants={fadeIn} className="text-[#705B46] leading-relaxed text-lg">
+            Hace trece años, una noche en un <em>nightclub</em> de la ciudad,
+            nuestras vidas se cruzaron. Desde aquel instante nos hicimos pareja,
+            y así seguimos, juntos, hasta el sol de hoy.
+          </motion.p>
+          <motion.p variants={fadeIn} className="text-[#705B46] leading-relaxed text-lg">
+            Hemos construido una relación sólida, con altos y bajos, a base de
+            comprensión y paciencia. Lo mismo hemos cultivado junto a nuestras
+            familias, que hoy se unen para celebrar este amor con nosotros.
+          </motion.p>
         </motion.div>
       </section>
 
@@ -221,7 +290,7 @@ export default function Invitation() {
           transition={{ duration: 1 }}
           className="relative z-10 text-white font-serif italic text-2xl md:text-4xl text-center px-6 max-w-2xl drop-shadow"
         >
-          "Como el mar encuentra la orilla, nos encontramos el uno al otro."
+          "Con altos y bajos, como las olas, nuestro amor siempre vuelve a la orilla."
         </motion.p>
       </section>
 
@@ -360,5 +429,6 @@ export default function Invitation() {
         <p className="text-sm uppercase tracking-[0.25em] opacity-60">Tu Pase Digital</p>
       </footer>
     </div>
+    </MotionConfig>
   );
 }
