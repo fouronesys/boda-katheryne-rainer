@@ -18,7 +18,6 @@ import oceanHeroPoster from "@/assets/ocean-hero-poster.jpg";
 import oceanTextureVideo from "@/assets/ocean-texture.mp4";
 import oceanTexturePoster from "@/assets/ocean-texture-poster.jpg";
 import couplePortrait from "@/assets/couple-portrait.jpg";
-import coupleSpotlight from "@/assets/couple-spotlight.jpg";
 
 const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
@@ -345,20 +344,6 @@ export default function Invitation() {
             comprensión y paciencia. Lo mismo hemos cultivado junto a nuestras
             familias, que hoy se unen para celebrar este amor con nosotros.
           </motion.p>
-
-          <motion.figure variants={fadeIn} className="mx-auto max-w-xl pt-2">
-            <div className="bg-white p-2 border border-[#BCAE98]/40 shadow-[0_12px_40px_rgba(85,57,39,0.18)]">
-              <img
-                src={coupleSpotlight}
-                alt="Katheryne y Rainer bajo un haz de luz"
-                loading="lazy"
-                className="w-full h-auto"
-              />
-            </div>
-            <figcaption className="mt-4 font-serif italic text-[#A38C70]">
-              Trece años de amor, un mismo camino.
-            </figcaption>
-          </motion.figure>
         </motion.div>
       </section>
 

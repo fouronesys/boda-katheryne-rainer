@@ -1,32 +1,39 @@
 ---
 name: Watermark removal for studio photos
-description: Reusable OpenCV recipe for stripping tiled semi-transparent "FOTOESTUDIOA" watermarks from the couple's engagement photos, plus a color-grading pass.
+description: Most effective pipeline for stripping the tiled semi-transparent "FOTOESTUDIOA" watermark from the couple's engagement photos to a studio-quality result.
 ---
 
 # Removing the studio watermark from couple photos
 
 The couple's photographer ships images stamped with a faint, tiled, semi-transparent
-"FOTOESTUDIOA" watermark. When new photos arrive, this approach removed it cleanly
-without smearing faces. Requires a transient Python 3.11 + opencv-python-headless,
-numpy, pillow install (uninstall afterward — it is NOT a runtime dep of the app).
+"FOTOESTUDIOA" watermark over the whole frame. Requires a transient
+Python 3.11 + opencv-python-headless/numpy/pillow install (uninstall afterward — it is
+NOT a runtime dep of the app; the install also adds a `.replit [nix] packages` line and
+`main.py`/`pyproject.toml`/`uv.lock` that should be removed when done).
 
-**Recipe (per image):**
-- Build a watermark mask with morphology black-hat **and** top-hat (catches both dark
-  and light watermark strokes), thresholded between a low/high band tuned per image.
-  - Bright/well-lit photo: band ~lo=6, hi=45.
-  - Dark/spotlight photo: first crush blacks (set black-point ~46) so the watermark
-    lifts above shadow noise, then mask with band ~lo=5, hi=55.
-- Protect real edges (faces, hair, clothing seams) from the mask using a Canny edge
-  map so inpainting does not erase facial detail.
-- Inpaint the masked regions with `cv2.INPAINT_TELEA`.
-- Finish with a grading pass: slight warmth, contrast, saturation bump, and unsharp
-  mask. Export JPEG q92.
+**Best approach (much better than inpaint-only):**
+1. **Background removal first** (`remove_image_background_tool` on the original) — the
+   watermark over the smooth studio backdrop is the largest area, and cutting the
+   couple out drops ALL of it at once and gives a clean contour. The tool returns a real
+   alpha channel even though a flattened preview can look like nothing happened — verify
+   the alpha, or composite over magenta to inspect.
+2. **Composite onto a fresh backdrop** — a soft radial warm-white→taupe gradient with a
+   gentle vignette and a faint grounding shadow reads as a professional studio portrait
+   and matches the invitation's warm palette.
+3. **Remove residual watermark on clothing only** — brightness/saturation-gated
+   black-hat + top-hat mask (light fabric: V>140, S<72), protect strong folds/seams with
+   Canny, inpaint with `INPAINT_NS`. Multi-pass.
+4. **Textured fabric (the dress)** — inpaint alone leaves faint text and smears the
+   ruching. Add an edge-preserving **bilateral "surface blur"** blended ~0.7 over the
+   fabric mask: it erases the low-contrast watermark while keeping the high-contrast
+   folds. This is the key to a clean dress without a plastic look.
+5. Finish: warmth, mild CLAHE clarity, +saturation, gentle sigmoidal contrast, 1.5×
+   upscale, unsharp. Export JPEG q94.
 
-**Why:** Aggressive face-protect variants (Haar-cascade masking, 2-pass inpaint)
-**over-smeared faces** — rejected. A faint residual on clothing/halo remains but is
-invisible at the invitation's display size (`max-w-xl`, ~576px). Tell the user a faint
-residual may exist rather than smearing faces to chase it.
-
-**How to apply:** Source photos live in `attached_assets/`; edited finals go to
-`artifacts/wedding/src/assets/` and are imported via the `@/assets/` Vite alias (same
-mechanism as the ocean posters). Place them in the "Nuestra Historia" section.
+**Why / hard-won lessons:**
+- **Never run a watermark-inpaint pass over skin/faces.** A "general" pass over skin
+  produced a blocky smeared patch on a cheek — worse than the faint traces it removed.
+  Restrict inpainting to bright low-saturation fabric; protect facial features.
+- Faint residual that only shows under heavy zoom is invisible at the invitation's
+  display size (~560px wide) — don't over-process chasing it and risk damaging detail.
+- Aggressive Haar face-protect / 2-pass inpaint variants over-smeared faces — rejected.
