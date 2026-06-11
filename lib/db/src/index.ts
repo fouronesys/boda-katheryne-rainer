@@ -70,4 +70,41 @@ function addColumnIfMissing(table: string, column: string, ddl: string): void {
   }
 }
 
+/**
+ * Dress-to-Impress glitch color palette.
+ * Called by the docker-entrypoint seed script on every CapRover deploy.
+ * Safe to call after ensureSchema() — upserts the config row if needed.
+ */
+export function seedDressToImpressColors(): void {
+  const GLITCH_COLORS = [
+    "#FF00FF", // neon magenta
+    "#FF0080", // glitch rose
+    "#FF1744", // glitch red
+    "#FF4500", // neon orange
+    "#FFD700", // electric gold
+    "#00FF88", // neon mint
+    "#00FFFF", // electric cyan
+    "#0066FF", // electric blue
+    "#7700FF", // cyber violet
+    "#FFFFFF", // pure white
+    "#0D0D0D", // obsidian black
+  ];
+
+  const colorsJson = JSON.stringify(GLITCH_COLORS);
+
+  const existing = sqlite
+    .prepare("SELECT id FROM wedding_config LIMIT 1")
+    .get() as { id: number } | undefined;
+
+  if (existing) {
+    sqlite
+      .prepare("UPDATE wedding_config SET allowed_colors = ? WHERE id = ?")
+      .run(colorsJson, existing.id);
+  } else {
+    sqlite
+      .prepare("INSERT INTO wedding_config (allowed_colors) VALUES (?)")
+      .run(colorsJson);
+  }
+}
+
 export * from "./schema";

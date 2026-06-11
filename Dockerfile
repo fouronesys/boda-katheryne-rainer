@@ -26,5 +26,8 @@ ENV DATABASE_FILE=/app/data/wedding.db
 # ADMIN_PASSWORD must be provided as an app env var in CapRover to unlock the
 # Configuración page.
 
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 80
-CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
+CMD ["/docker-entrypoint.sh"]
