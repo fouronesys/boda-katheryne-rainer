@@ -1,39 +1,41 @@
 ---
 name: Watermark removal for studio photos
-description: Most effective pipeline for stripping the tiled semi-transparent "FOTOESTUDIOA" watermark from the couple's engagement photos to a studio-quality result.
+description: Pipeline for stripping the tiled semi-transparent "FOTOESTUDIOA" watermark from the couple's engagement photos to a natural, studio-quality result.
 ---
 
 # Removing the studio watermark from couple photos
 
 The couple's photographer ships images stamped with a faint, tiled, semi-transparent
-"FOTOESTUDIOA" watermark over the whole frame. Requires a transient
-Python 3.11 + opencv-python-headless/numpy/pillow install (uninstall afterward — it is
-NOT a runtime dep of the app; the install also adds a `.replit [nix] packages` line and
-`main.py`/`pyproject.toml`/`uv.lock` that should be removed when done).
+"FOTOESTUDIOA"/"FOTOS" watermark repeated diagonally over the whole frame. Requires a
+transient Python 3.11 + opencv-python-headless/numpy/pillow install (uninstall when done;
+the install also adds a `.replit [nix] packages` line and `main.py`/`pyproject.toml`/
+`uv.lock` that should be removed — note these may end up git-tracked from a prior
+auto-commit, so they show as deletions).
 
-**Best approach (much better than inpaint-only):**
-1. **Background removal first** (`remove_image_background_tool` on the original) — the
-   watermark over the smooth studio backdrop is the largest area, and cutting the
-   couple out drops ALL of it at once and gives a clean contour. The tool returns a real
-   alpha channel even though a flattened preview can look like nothing happened — verify
-   the alpha, or composite over magenta to inspect.
-2. **Composite onto a fresh backdrop** — a soft radial warm-white→taupe gradient with a
-   gentle vignette and a faint grounding shadow reads as a professional studio portrait
-   and matches the invitation's warm palette.
-3. **Remove residual watermark on clothing only** — brightness/saturation-gated
-   black-hat + top-hat mask (light fabric: V>140, S<72), protect strong folds/seams with
-   Canny, inpaint with `INPAINT_NS`. Multi-pass.
-4. **Textured fabric (the dress)** — inpaint alone leaves faint text and smears the
-   ruching. Add an edge-preserving **bilateral "surface blur"** blended ~0.7 over the
-   fabric mask: it erases the low-contrast watermark while keeping the high-contrast
-   folds. This is the key to a clean dress without a plastic look.
-5. Finish: warmth, mild CLAHE clarity, +saturation, gentle sigmoidal contrast, 1.5×
-   upscale, unsharp. Export JPEG q94.
+**No AI fallback:** `generateImage` is text-to-image only — there is NO img2img/edit/inpaint
+function, so the real faces cannot be AI-retouched. Classical OpenCV is the only option.
 
-**Why / hard-won lessons:**
-- **Never run a watermark-inpaint pass over skin/faces.** A "general" pass over skin
-  produced a blocky smeared patch on a cheek — worse than the faint traces it removed.
-  Restrict inpainting to bright low-saturation fabric; protect facial features.
-- Faint residual that only shows under heavy zoom is invisible at the invitation's
-  display size (~560px wide) — don't over-process chasing it and risk damaging detail.
-- Aggressive Haar face-protect / 2-pass inpaint variants over-smeared faces — rejected.
+**What works (natural, professional) — pipeline:**
+1. **Background removal first** (`remove_image_background_tool`) drops the entire watermarked
+   backdrop at once and gives a clean contour. (Note: it returns the cutout downscaled, e.g.
+   900x600.) Composite onto a soft, near-neutral studio gradient with a SUBTLE vignette.
+2. **Even, edge-preserving smoothing** with `cv2.edgePreservingFilter` blended UNIFORMLY —
+   this is the key to no blotches. Blend stronger on skin (~0.7) than elsewhere (~0.4).
+   Add back only tiny-radius (~1px) micro-detail so it isn't plastic; the watermark strokes
+   are wider so they don't come back.
+3. **Flat white fabric** (bright + low-sat + not-skin mask): apply STRONG multi-pass
+   edge-preserving smoothing (~0.9 blend). Folds/plackets are high-contrast edges so they
+   survive; the thin watermark text on flat panels is erased.
+4. **Textured fabric (her ruched dress): leave it natural** — the watermark is already hidden
+   by the weave; processing it just creates blotches.
+5. **Neutral white balance** (gain from near-white highlights) + **REDUCE saturation (~0.8x)**
+   + mild S-curve. NO CLAHE, NO heavy warmth.
+
+**Hard-won lessons (what the user rejected):**
+- **`INPAINT` + heavy `bilateralFilter` "surface blur" on fabric → ugly watercolor BLOTCHES
+  ("manchas").** User called it unprofessional. Inpaint is the wrong tool here.
+- **A general inpaint/smooth pass over faces → blocky cheek smear.** Never inpaint skin.
+- **Adding warmth + +saturation + CLAHE → oversaturated/orange, unprofessional.** Go natural.
+- **FFT notch filtering fails** — the watermark text is broadband, not a pure periodic carrier.
+- Faint residual visible only at extreme zoom is invisible at the invitation display width
+  (~560px); do NOT over-process chasing it — over-processing is what the user disliked.
