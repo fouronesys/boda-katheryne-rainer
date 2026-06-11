@@ -1,2 +1,2 @@
 - [api-server bundle native deps](api-server-native-deps.md) — esbuild externalizes native modules; each must be a DIRECT dep of @workspace/api-server or the built server crashes with ERR_MODULE_NOT_FOUND.
-- [Watermark removal for studio photos](watermark-removal.md) — bg-removal to drop the watermarked backdrop, then EVEN edge-preserving smoothing + neutral WB + lower saturation. NEVER inpaint (causes blotches); leave textured fabric natural.
+- [Watermark removal for studio photos](watermark-removal.md) — bg-removal + TEXTURE-AWARE smoothing (smooth only faint/flat fabric, protect bold weave) keeps clothing texture & erases watermark; NEVER inpaint (blotches); sepia makes watermark MORE visible so remove it first.
