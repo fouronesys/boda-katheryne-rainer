@@ -1,1 +1,1 @@
-- [api-server native deps](api-server-native-deps.md) — externalized native modules (better-sqlite3 etc.) must be DIRECT deps of @workspace/api-server, not transitive, or the bundled server crashes on boot.
+- [Watermark removal for studio photos](watermark-removal.md) — OpenCV morphology black-hat/top-hat mask + Canny edge-protect + INPAINT_TELEA to strip the tiled "FOTOESTUDIOA" watermark; don't over-smear faces.
