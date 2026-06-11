@@ -176,7 +176,7 @@ export default function Invitation() {
 
           <motion.h1
             variants={fadeIn}
-            className="font-serif italic text-6xl sm:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-[#4A301F]"
+            className="font-script text-7xl sm:text-8xl lg:text-9xl leading-[1.1] text-[#4A301F]"
             style={{ textShadow: "0 2px 22px rgba(253,251,247,0.85)" }}
           >
             {weddingConfig.brideName}
@@ -185,7 +185,7 @@ export default function Invitation() {
           <motion.div variants={fadeIn} className="flex items-center gap-4 my-5">
             <span className="h-px w-10 sm:w-14 bg-[#A38C70]/70" />
             <span
-              className="font-serif italic text-5xl sm:text-6xl text-[#705B46]"
+              className="font-script text-5xl sm:text-6xl text-[#705B46]"
               style={{ textShadow: "0 2px 18px rgba(253,251,247,0.85)" }}
             >
               &amp;
@@ -195,7 +195,7 @@ export default function Invitation() {
 
           <motion.h1
             variants={fadeIn}
-            className="font-serif italic text-6xl sm:text-7xl lg:text-8xl leading-[1.02] tracking-tight text-[#4A301F]"
+            className="font-script text-7xl sm:text-8xl lg:text-9xl leading-[1.1] text-[#4A301F]"
             style={{ textShadow: "0 2px 22px rgba(253,251,247,0.85)" }}
           >
             {weddingConfig.groomName}
