@@ -4,114 +4,16 @@ import {
   useGetWeddingConfig,
   useUpdateWeddingConfig,
   getGetWeddingConfigQueryKey,
-  setAdminPassword,
-  customFetch,
 } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, X, Heart, Shirt, Lock } from "lucide-react";
-
-const ADMIN_PWD_STORAGE_KEY = "wedding_admin_pwd";
+import { Plus, X, Heart, Shirt } from "lucide-react";
 
 export default function AdminConfig() {
-  const [unlocked, setUnlocked] = useState(false);
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem(ADMIN_PWD_STORAGE_KEY);
-    if (stored) {
-      setAdminPassword(stored);
-      setUnlocked(true);
-    }
-  }, []);
-
-  const handleUnlock = (password: string) => {
-    sessionStorage.setItem(ADMIN_PWD_STORAGE_KEY, password);
-    setAdminPassword(password);
-    setUnlocked(true);
-  };
-
-  if (!unlocked) {
-    return <ConfigLock onUnlock={handleUnlock} />;
-  }
-
   return <ConfigForm />;
-}
-
-function ConfigLock({ onUnlock }: { onUnlock: (password: string) => void }) {
-  const { toast } = useToast();
-  const [password, setPassword] = useState("");
-  const [verifying, setVerifying] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!password) return;
-    setVerifying(true);
-    try {
-      await customFetch("/api/admin/verify", {
-        method: "POST",
-        headers: { "x-admin-password": password },
-      });
-      onUnlock(password);
-    } catch {
-      toast({
-        title: "Contraseña incorrecta",
-        description: "Inténtalo de nuevo para acceder a la configuración.",
-        variant: "destructive",
-      });
-      setPassword("");
-    } finally {
-      setVerifying(false);
-    }
-  };
-
-  return (
-    <div className="max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg border border-[#BCAE98]/30 shadow-sm space-y-6 text-center"
-      >
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E7DFD1] text-[#705B46]">
-            <Lock className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-serif font-semibold text-[#553927]">
-              Configuración protegida
-            </h2>
-            <p className="text-[#705B46] mt-1 text-sm">
-              Ingresa la contraseña para editar los detalles de la boda.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2 text-left">
-          <Label htmlFor="admin-password">Contraseña</Label>
-          <Input
-            id="admin-password"
-            name="admin-password"
-            type="password"
-            autoFocus
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border-[#BCAE98]"
-            placeholder="••••••••"
-          />
-        </div>
-
-        <Button
-          type="submit"
-          disabled={verifying || !password}
-          size="lg"
-          className="w-full bg-[#553927] hover:bg-[#705B46] text-white"
-        >
-          {verifying ? "Verificando..." : "Acceder"}
-        </Button>
-      </form>
-    </div>
-  );
 }
 
 function ConfigForm() {
