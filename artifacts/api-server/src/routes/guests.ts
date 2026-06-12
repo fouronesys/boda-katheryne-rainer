@@ -13,7 +13,7 @@ import {
   UpdateGuestResponse,
 } from "@workspace/api-zod";
 import { serializeGuest } from "../lib/serialize";
-import { requireAdmin } from "../lib/admin-auth";
+import { requirePanel } from "../lib/admin-auth";
 
 const router: IRouter = Router();
 
@@ -21,7 +21,7 @@ function generateToken(): string {
   return randomBytes(16).toString("hex");
 }
 
-router.get("/guests", requireAdmin, async (req, res): Promise<void> => {
+router.get("/guests", requirePanel, async (req, res): Promise<void> => {
   const guests = await db
     .select()
     .from(guestsTable)
@@ -29,7 +29,7 @@ router.get("/guests", requireAdmin, async (req, res): Promise<void> => {
   res.json(ListGuestsResponse.parse(guests.map(serializeGuest)));
 });
 
-router.post("/guests", requireAdmin, async (req, res): Promise<void> => {
+router.post("/guests", requirePanel, async (req, res): Promise<void> => {
   const parsed = CreateGuestBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -45,7 +45,7 @@ router.post("/guests", requireAdmin, async (req, res): Promise<void> => {
   res.status(201).json(GetGuestResponse.parse(serializeGuest(guest)));
 });
 
-router.get("/guests/:id", requireAdmin, async (req, res): Promise<void> => {
+router.get("/guests/:id", requirePanel, async (req, res): Promise<void> => {
   const params = GetGuestParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -65,7 +65,7 @@ router.get("/guests/:id", requireAdmin, async (req, res): Promise<void> => {
   res.json(GetGuestResponse.parse(serializeGuest(guest)));
 });
 
-router.patch("/guests/:id", requireAdmin, async (req, res): Promise<void> => {
+router.patch("/guests/:id", requirePanel, async (req, res): Promise<void> => {
   const params = UpdateGuestParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -92,7 +92,7 @@ router.patch("/guests/:id", requireAdmin, async (req, res): Promise<void> => {
   res.json(UpdateGuestResponse.parse(serializeGuest(guest)));
 });
 
-router.delete("/guests/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/guests/:id", requirePanel, async (req, res): Promise<void> => {
   const params = DeleteGuestParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { 
   useGetStats, 
@@ -8,6 +8,8 @@ import {
   useDeleteGuest,
   getListGuestsQueryKey,
   getGetStatsQueryKey,
+  setPanelPassword,
+  customFetch,
   type Guest
 } from "@workspace/api-client-react";
 import { 
@@ -33,7 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { QRCodeSVG } from "qrcode.react";
-import { Plus, Copy, QrCode, Trash, Edit, Search, Users, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Plus, Copy, QrCode, Trash, Edit, Search, Users, CheckCircle2, Clock, XCircle, Lock } from "lucide-react";
 
 const statusLabels: Record<string, string> = {
   pending: "Pendiente",
@@ -49,7 +51,33 @@ const getInitials = (name: string) =>
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
 
+const PANEL_PWD_STORAGE_KEY = "wedding_panel_pwd";
+
 export default function AdminDashboard() {
+  const [unlocked, setUnlocked] = useState(false);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem(PANEL_PWD_STORAGE_KEY);
+    if (stored) {
+      setPanelPassword(stored);
+      setUnlocked(true);
+    }
+  }, []);
+
+  const handleUnlock = (password: string) => {
+    sessionStorage.setItem(PANEL_PWD_STORAGE_KEY, password);
+    setPanelPassword(password);
+    setUnlocked(true);
+  };
+
+  if (!unlocked) {
+    return <PanelLock onUnlock={handleUnlock} />;
+  }
+
+  return <DashboardContent />;
+}
+
+function DashboardContent() {
   const { data: stats } = useGetStats();
   const { data: guests, isLoading: guestsLoading } = useListGuests();
   const [searchTerm, setSearchTerm] = useState("");
@@ -405,6 +433,80 @@ export default function AdminDashboard() {
           </p>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function PanelLock({ onUnlock }: { onUnlock: (password: string) => void }) {
+  const { toast } = useToast();
+  const [password, setPassword] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!password) return;
+    setVerifying(true);
+    try {
+      await customFetch("/api/panel/verify", {
+        method: "POST",
+        headers: { "x-panel-password": password },
+      });
+      onUnlock(password);
+    } catch {
+      toast({
+        title: "Contraseña incorrecta",
+        description: "Inténtalo de nuevo para acceder al panel.",
+        variant: "destructive",
+      });
+      setPassword("");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-lg border border-[#BCAE98]/30 shadow-sm space-y-6 text-center"
+      >
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E7DFD1] text-[#705B46]">
+            <Lock className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-serif font-semibold text-[#553927]">
+              Panel de invitaciones
+            </h2>
+            <p className="text-[#705B46] mt-1 text-sm">
+              Ingresa la contraseña para gestionar los invitados.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-left">
+          <Label htmlFor="panel-password">Contraseña</Label>
+          <Input
+            id="panel-password"
+            name="panel-password"
+            type="password"
+            autoFocus
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border-[#BCAE98]"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={verifying || !password}
+          size="lg"
+          className="w-full bg-[#553927] hover:bg-[#705B46] text-white"
+        >
+          {verifying ? "Verificando..." : "Acceder"}
+        </Button>
+      </form>
     </div>
   );
 }

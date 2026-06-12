@@ -18,8 +18,10 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 let _baseUrl: string | null = null;
 let _authTokenGetter: AuthTokenGetter | null = null;
 let _adminPassword: string | null = null;
+let _panelPassword: string | null = null;
 
 const ADMIN_PASSWORD_HEADER = "x-admin-password";
+const PANEL_PASSWORD_HEADER = "x-panel-password";
 
 /**
  * Set the admin password attached as the `x-admin-password` header on every
@@ -28,6 +30,15 @@ const ADMIN_PASSWORD_HEADER = "x-admin-password";
  */
 export function setAdminPassword(password: string | null): void {
   _adminPassword = password && password.length > 0 ? password : null;
+}
+
+/**
+ * Set the panel password attached as the `x-panel-password` header on every
+ * request. Used to unlock the guest management dashboard.
+ * Pass `null` to clear it (lock again).
+ */
+export function setPanelPassword(password: string | null): void {
+  _panelPassword = password && password.length > 0 ? password : null;
 }
 
 /**
@@ -373,6 +384,11 @@ export async function customFetch<T = unknown>(
   // Attach the admin password header when configured and not already set.
   if (_adminPassword && !headers.has(ADMIN_PASSWORD_HEADER)) {
     headers.set(ADMIN_PASSWORD_HEADER, _adminPassword);
+  }
+
+  // Attach the panel password header when configured and not already set.
+  if (_panelPassword && !headers.has(PANEL_PASSWORD_HEADER)) {
+    headers.set(PANEL_PASSWORD_HEADER, _panelPassword);
   }
 
   const requestInfo = { method, url: resolveUrl(input) };

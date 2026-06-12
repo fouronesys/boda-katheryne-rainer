@@ -2,11 +2,11 @@ import { Router, type IRouter } from "express";
 import { db, guestsTable } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { GetStatsResponse } from "@workspace/api-zod";
-import { requireAdmin } from "../lib/admin-auth";
+import { requirePanel } from "../lib/admin-auth";
 
 const router: IRouter = Router();
 
-router.get("/stats", requireAdmin, async (req, res): Promise<void> => {
+router.get("/stats", requirePanel, async (req, res): Promise<void> => {
   const rows = await db
     .select({
       total: sql<number>`count(*)::int`,
