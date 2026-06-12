@@ -6,7 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useState, useEffect } from "react";
-import { MapPin, Heart, PartyPopper, Check } from "lucide-react";
+import { MapPin, Heart, PartyPopper, Check, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -477,6 +477,51 @@ export default function Invitation() {
               </p>
             </motion.div>
           )}
+        </motion.div>
+      </section>
+
+      {/* Regalos Section */}
+      <section className="py-24 px-6 bg-[#FAF9F6]">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={fadeIn}
+          className="max-w-md mx-auto"
+        >
+          <div className="bg-white border border-[#BCAE98]/40 shadow-sm p-10 text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#BCAE98]/60 text-[#A38C70]">
+                <Gift className="h-7 w-7" />
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-serif text-3xl text-[#553927] mb-3">Regalos</h2>
+              <div className="flex justify-center text-[#BCAE98] mb-5">
+                <WaveDivider />
+              </div>
+              <p className="text-[#705B46] leading-relaxed">
+                Si deseas hacernos un regalo, puedes contribuir mediante depósito bancario:
+              </p>
+            </div>
+
+            <div className="space-y-5 text-left">
+              <p className="text-center text-sm text-[#A38C70] uppercase tracking-widest">Katheryne Madera</p>
+
+              <div className="border border-[#BCAE98]/30 rounded-none p-4 space-y-1">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#A38C70]">Banreservas</p>
+                <p className="font-serif text-xl text-[#553927] tracking-wider">9605406683</p>
+              </div>
+
+              <div className="border border-[#BCAE98]/30 rounded-none p-4 space-y-1">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#A38C70]">Banco Popular</p>
+                <p className="font-serif text-xl text-[#553927] tracking-wider">794336487</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-[#A38C70] italic pt-2">(Sólo depósito bancario)</p>
+          </div>
         </motion.div>
       </section>
 
