@@ -77,18 +77,41 @@ function addColumnIfMissing(table: string, column: string, ddl: string): void {
  */
 export function seedDressToImpressColors(): void {
   const GLITCH_COLORS = [
-    "#FF00FF", // neon magenta
-    "#FF0080", // glitch rose
-    "#FF1744", // glitch red
-    "#FF4500", // neon orange
-    "#FFD700", // electric gold
-    "#00FF88", // neon mint
-    "#00FFFF", // electric cyan
-    "#0066FF", // electric blue
-    "#7700FF", // cyber violet
-    "#FFFFFF", // pure white
-    "#0D0D0D", // obsidian black
+    "#C0C0C0", // Silver (DG-1)
+    "#D4AF37", // Light Gold (DG-2)
+    "#D32F2F", // Red (DG-3)
+    "#00AEEF", // Aqua (DG-4)
+    "#B57EDC", // Lavender (DG-7)
+    "#009B77", // Emerald (DG-8)
+    "#5D4037", // Brown (DG-9)
+    "#0D0D0D", // Black (DG-10)
+    "#E8E8E8", // Holo Silver (DG-11)
+    "#FFD700", // Gold (DG-12)
+    "#1A237E", // Navy (DG-13)
+    "#E91E63", // Pink (DG-14)
+    "#00C9A7", // Jade (DG-16)
+    "#008F39", // Green (DG-17)
+    "#66BB44", // Light Green (DG-19)
+    "#616161", // Grey (DG-21)
+    "#B87333", // Copper (DG-22)
+    "#4A235A", // Dark Purple (DG-23)
+    "#2962FF", // Royal Blue (DG-24)
+    "#7B1FA2", // Purple (DG-25)
+    "#FF1493", // Hot Pink (DG-26)
+    "#800020", // Maroon (DG-28)
+    "#FFFFFF", // White (DG-29)
+    "#B76E79", // Rose Gold (DG-31)
+    "#F7C6D0", // Lady Pink (DG-32)
+    "#CCFF33", // Neon Rainbow Yellow (DG-302)
+    "#FFB347", // Neon Rainbow Orange (DG-303)
+    "#FF66CC", // Neon Rainbow Pink (DG-304)
+    "#7CFC6B", // Neon Rainbow Green (DG-305)
+    "#7FDBFF", // Neon Rainbow Blue (DG-306)
+    "#D291FF", // Neon Rainbow Purple (DG-307)
+    "#0038A8", // Blue (OCG-05)
+    "#C2185B", // Cherry (OCG-06)
   ];
+}
 
   const colorsJson = JSON.stringify(GLITCH_COLORS);
 
