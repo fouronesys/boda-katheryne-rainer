@@ -111,7 +111,6 @@ export function seedDressToImpressColors(): void {
     "#0038A8", // Blue (OCG-05)
     "#C2185B", // Cherry (OCG-06)
   ];
-}
 
   const colorsJson = JSON.stringify(GLITCH_COLORS);
 
